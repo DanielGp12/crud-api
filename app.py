@@ -3,14 +3,16 @@ from flask_cors import CORS
 import firebase_admin
 from firebase_admin import credentials, firestore
 import os
-
+import json
 app = Flask(__name__)
 CORS(app)
+
 
 # =========================
 # CONEXIÓN FIREBASE
 # =========================
-cred = credentials.Certificate("/etc/secrets/serviceAccountKey.json")
+cred_dict = json.loads(os.getenv("FIREBASE_CREDENTIALS"))
+cred = credentials.Certificate(cred_dict)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
