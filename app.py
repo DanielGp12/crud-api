@@ -10,8 +10,9 @@ CORS(app)
 # =========================
 # CONEXIÓN FIREBASE
 # =========================
-cred = credentials.Certificate("serviceAccountKey.json")
-firebase_admin.initialize_app(cred)
+import json
+cred_dict = json.loads(os.getenv("FIREBASE_CREDENTIALS"))
+cred = credentials.Certificate(cred_dict)
 db = firestore.client()
 
 # =========================
