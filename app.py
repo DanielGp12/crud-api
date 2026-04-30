@@ -42,7 +42,25 @@ def agregar_rol():
     doc_ref.set({'nombre': data['nombre']})
 
     return jsonify({"mensaje": "Rol creado", "id": doc_ref.id})
+    
+@app.route('/roles/<id>', methods=['PUT'])
+def actualizar_rol(id):
+    data = request.json
 
+    if not data.get('nombre'):
+        return jsonify({"error": "nombre requerido"}), 400
+
+    db.collection('roles').document(id).update({
+        'nombre': data['nombre']
+    })
+
+    return jsonify({"mensaje": "Rol actualizado"})
+
+
+@app.route('/roles/<id>', methods=['DELETE'])
+def eliminar_rol(id):
+    db.collection('roles').document(id).delete()
+    return jsonify({"mensaje": "Rol eliminado"})
 # =========================
 # USUARIOS
 # =========================
@@ -86,7 +104,33 @@ def agregar_usuario():
     })
 
     return jsonify({"mensaje": "Usuario creado", "id": doc_ref.id})
+    
+@app.route('/usuarios/<id>', methods=['PUT'])
+def actualizar_usuario(id):
+    data = request.json
 
+    if not data.get('nombre') or not data.get('email') or not data.get('id_rol'):
+        return jsonify({"error": "datos incompletos"}), 400
+
+    id_rol = str(data['id_rol'])
+
+    rol_doc = db.collection('roles').document(id_rol).get()
+    if not rol_doc.exists:
+        return jsonify({"error": "El rol no existe"}), 400
+
+    db.collection('usuarios').document(id).update({
+        'nombre': data['nombre'],
+        'email': data['email'],
+        'id_rol': id_rol
+    })
+
+    return jsonify({"mensaje": "Usuario actualizado"})
+
+
+@app.route('/usuarios/<id>', methods=['DELETE'])
+def eliminar_usuario(id):
+    db.collection('usuarios').document(id).delete()
+    return jsonify({"mensaje": "Usuario eliminado"})
 # =========================
 # CATEGORIAS
 # =========================
